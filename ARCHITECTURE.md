@@ -1,6 +1,6 @@
 This document maps the repository files to their roles in the Vivado-based FPGA workflow. It explains how the custom AXI IP is packaged and added to the block design, how memory images initialize the BRAM-based subsystems for simulation or hardware tests, and how constraints and Tcl scripts prepare the design for implementation on the target FPGA board.
 
-Here is a brief but complete breakdown of the purpose of each file and exactly where it is used in your Vivado project workflow:
+Here is a brief but complete breakdown of the purpose of each file and exactly where it is used in my Vivado project workflow:
 
 ### 1. Custom IP Source & Packaging Files
 *   AT1051_CDAC.v
