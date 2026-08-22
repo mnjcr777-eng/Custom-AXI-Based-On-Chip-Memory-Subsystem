@@ -28,7 +28,7 @@ After weeks of refining the data paths, I built this custom AXI-based memory arc
 
 At a high level, this architecture is a data processing pipeline that flows left to right. It begins with system initialization (clock and reset generation), feeds into the custom processing IP which acts as the system master, routes through an AXI interconnect crossbar, and terminates into two distinct domains: Phase 1 (Core Interconnect and Memory Integration) and Phase 2 (External Peripheral I/O).
 
-[ROM & RAM Integration](rom,ram_integration.png)
+![ROM & RAM Integration](rom,ram_integration.png)
 
 ### Phase 1: Core Interconnect and Memory Integration
 This subsystem connects the custom processing IP, `AT1051_CDAC_0`, to two independent on-chip Block RAM memories through an AXI-based memory architecture. The custom IP is the AXI master: it initiates read and write transactions whenever it needs to fetch stored instructions, coefficients, samples, intermediate values, or other working data.
