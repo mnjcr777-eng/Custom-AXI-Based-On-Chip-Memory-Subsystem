@@ -33,9 +33,9 @@ At a high level, this architecture is a data processing pipeline that flows left
 ### Phase 1: Core Interconnect and Memory Integration
 This subsystem connects the custom processing IP, `AT1051_CDAC_0`, to two independent on-chip Block RAM memories through an AXI-based memory architecture. The custom IP is the AXI master: it initiates read and write transactions whenever it needs to fetch stored instructions, coefficients, samples, intermediate values, or other working data.
 The two RAM memories are intentionally separated into two addressable regions:
-1. **RAM subsystem 0 : ** 
+1. RAM subsystem 0 : 
    `axi_bram_ctrl_0` + `blk_mem_gen_0`
-2. **RAM subsystem 1 : **
+2. RAM subsystem 1 :
    `axi_bram_ctrl_1` + `blk_mem_gen_1`
 
 These are not merely separate memory blocks. Each RAM subsystem requires both an AXI-facing controller and a physical BRAM implementation:
@@ -156,7 +156,7 @@ The controller generates the native BRAM-side signals:
 
 The controller is necessary because AXI accesses may involve independent address, data, and response channels, while BRAM uses a simpler synchronous port interface. `axi_bram_ctrl_0` bridges these two protocols.
 
-** Why axi_bram_ctrl_0 connects to blk_mem_gen_0**
+Why axi_bram_ctrl_0 connects to blk_mem_gen_0 ?
 
 The BRAM-side port of `axi_bram_ctrl_0` connects directly to `BRAM_PORTA` of `blk_mem_gen_0`.
 This connection exists because `blk_mem_gen_0` is the actual memory storage, while `axi_bram_ctrl_0` supplies the operational signals required to access it.
@@ -176,7 +176,7 @@ The direction differs depending on the operation:
 * **Write: Controller to BRAM** : Address, enable, write enable, and write data travel from `axi_bram_ctrl_0` to `blk_mem_gen_0`.
 * **Read: BRAM to controller** : The controller supplies address and enable, then `blk_mem_gen_0` returns the stored word through `douta` to the controller. The controller converts it into an AXI read response and sends it back through the crossbar to `AT1051_CDAC_0`.
 
-** blk_mem_gen_0: physical memory storage**
+blk_mem_gen_0: physical memory storage
 
 `blk_mem_gen_0` is the physical FPGA Block RAM configured by the Block Memory Generator IP. It exposes `BRAM_PORTA`, which is its native access interface.
 It does not understand AXI transactions. It only stores bits and responds to native memory control signals. This is exactly why it is connected to `axi_bram_ctrl_0` rather than directly to the custom IP or crossbar.
@@ -561,8 +561,7 @@ I designed the workspace to be as self-contained as possible.
 
 ## 🚀 Hardware Validation & Debugging
 
-Verifying an AXI subsystem takes patience. I relied heavily on serial debugging to confirm memory writes. 
-
+ 
 ### Running Serial Tests
 1. Download and install a serial terminal application like Tera Term.
 2. Connect your FPGA board via USB-UART.
