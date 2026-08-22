@@ -523,7 +523,7 @@ The top connection occurs at **build/configuration time**: Vivado uses the COE f
 ## 📂 Directory Structure
 
 ```text
-.
+Custom-AXI-Based-On-Chip-Memory-Subsystem/
 ├── AT1051_CDAC.v             # Custom Verilog source for AT1051_CDAC_0
 ├── component.xml             # Vivado IP-packaging metadata
 ├── AT1051_CDAC_v1_0.tcl      # Vivado IP-packaging/support script
