@@ -54,7 +54,7 @@ AT1051_CDAC_0 (AXI Master) -> axi_crossbar_0 (Address-based routing) -> axi_bram
 
 The clocking and reset blocks ensure that every component starts in a known state and operates synchronously.
 
-### 2. System Clock and Reset Infrastructure
+### System Clock and Reset Infrastructure
 Before discussing memory transactions, the design must establish a stable shared clock and reset domain. AXI interfaces require all connected components to agree on timing, so the clock and reset network is fundamental to the operation of every later block.
 
 **clk_wiz** : `clk_wiz` receives the external board clock, `clk_100MHz`, and generates the internal clock, `clk_out1`.
@@ -84,7 +84,7 @@ These reset outputs are connected to the AXI components because an AXI fabric mu
 
 Thus, the clock and reset subsystem establishes the stable operating environment required before either RAM can be accessed.
 
-### 3. Custom Processing IP: AT1051_CDAC_0
+### Custom Processing IP: AT1051_CDAC_0
 `AT1051_CDAC_0` is the functional source of memory accesses. Its AXI master ports, shown as `M00_AXI`, `M01_AXI`, and related AXI channels, generate requests to read from or write to the memory system.
 
 An AXI transaction from this block typically contains:
@@ -107,7 +107,7 @@ The custom IP connects to `axi_crossbar_0` because it should not directly contro
 Direct use of those signals would require the custom IP to implement BRAM timing behavior and memory arbitration itself. Instead, it uses AXI, which provides a standard transaction-based interface. The crossbar and BRAM controllers handle routing and AXI-to-BRAM conversion.
 Therefore, the custom IP’s output is connected to the crossbar because the crossbar is the entry point to the shared memory interconnect.
 
-### 4. AXI Routing Block: axi_crossbar_0
+### AXI Routing Block: axi_crossbar_0
 `axi_crossbar_0` receives transactions from the custom IP through its slave-side interfaces, such as `S00_AXI` and `S01_AXI`, and forwards them through its master-side interfaces, including `M00_AXI`, `M01_AXI`, and others.
 
 The names can initially seem reversed, but they are named from the crossbar’s perspective:
@@ -133,13 +133,13 @@ When the custom IP produces an address inside the first configured range, the cr
 
 This is why the crossbar is placed between the custom IP and both RAM subsystems: it provides a single memory-access path from the IP while preserving separate physical RAM regions.
 
-### 5. RAM Subsystem 0: axi_bram_ctrl_0 and blk_mem_gen_0
+### RAM Subsystem 0: axi_bram_ctrl_0 and blk_mem_gen_0
 The first usable RAM is formed by the pair:
 `RAM subsystem 0 = axi_bram_ctrl_0 + blk_mem_gen_0`
 
 Neither block alone is the complete AXI-accessible memory.
 
-**5.1 axi_bram_ctrl_0: AXI-to-BRAM protocol conversion**
+**axi_bram_ctrl_0: AXI-to-BRAM protocol conversion**
 
 `axi_bram_ctrl_0` receives an AXI request from the crossbar through its `S_AXI` interface.
 It is connected to the crossbar output because the crossbar has already determined that the requested address belongs to RAM subsystem 0. The controller does not need to decide between multiple system memory regions; it only converts the accepted AXI transaction into signals appropriate for its attached BRAM.
@@ -156,7 +156,7 @@ The controller generates the native BRAM-side signals:
 
 The controller is necessary because AXI accesses may involve independent address, data, and response channels, while BRAM uses a simpler synchronous port interface. `axi_bram_ctrl_0` bridges these two protocols.
 
-**5.2 Why axi_bram_ctrl_0 connects to blk_mem_gen_0**
+** Why axi_bram_ctrl_0 connects to blk_mem_gen_0**
 
 The BRAM-side port of `axi_bram_ctrl_0` connects directly to `BRAM_PORTA` of `blk_mem_gen_0`.
 This connection exists because `blk_mem_gen_0` is the actual memory storage, while `axi_bram_ctrl_0` supplies the operational signals required to access it.
@@ -176,12 +176,12 @@ The direction differs depending on the operation:
 * **Write: Controller to BRAM** : Address, enable, write enable, and write data travel from `axi_bram_ctrl_0` to `blk_mem_gen_0`.
 * **Read: BRAM to controller** : The controller supplies address and enable, then `blk_mem_gen_0` returns the stored word through `douta` to the controller. The controller converts it into an AXI read response and sends it back through the crossbar to `AT1051_CDAC_0`.
 
-**5.3 blk_mem_gen_0: physical memory storage**
+** blk_mem_gen_0: physical memory storage**
 
 `blk_mem_gen_0` is the physical FPGA Block RAM configured by the Block Memory Generator IP. It exposes `BRAM_PORTA`, which is its native access interface.
 It does not understand AXI transactions. It only stores bits and responds to native memory control signals. This is exactly why it is connected to `axi_bram_ctrl_0` rather than directly to the custom IP or crossbar.
 
-### 6. RAM Subsystem 1: axi_bram_ctrl_1 and blk_mem_gen_1
+### RAM Subsystem 1: axi_bram_ctrl_1 and blk_mem_gen_1
 The second RAM uses the same architectural pattern:
 `RAM subsystem 1 = axi_bram_ctrl_1 + blk_mem_gen_1`
 
@@ -205,7 +205,7 @@ Keeping the RAMs separate is useful when the design needs distinct storage roles
 
 The important conceptual point is that the two RAMs are separated by **address mapping in the crossbar**, not by the slices alone.
 
-### 7. Address Slice Blocks: xlslice_0 and xlslice_1
+### Address Slice Blocks: xlslice_0 and xlslice_1
 The `xlslice_0` and `xlslice_1` blocks extract selected bits from a wider signal, shown as `Din[16:0]`.
 From the diagram:
 
@@ -225,7 +225,7 @@ Similarly, a larger RAM region may require 13 local address bits:
 
 The slice blocks should be described as **address-bit extraction or local-address derivation logic**. They do not themselves route AXI transactions and do not define which controller the crossbar selects. That selection is performed by the crossbar’s configured address map.
 
-### 8. End-to-End Read and Write Operation
+### End-to-End Read and Write Operation
 The complete write path is:
 1. `AT1051_CDAC_0` generates an AXI write address and write data.
 2. The transaction enters `axi_crossbar_0`.
@@ -539,6 +539,7 @@ The top connection occurs at **build/configuration time**: Vivado uses the COE f
 └── README.md                 # Project documentation
 ```
 ---
+To understand what each file in this project does and how it fits into Vivado, check out our [Architecture Guide](ARCHITECTURE.md).
 
 ## 💻 Prerequisites & Setup
 
