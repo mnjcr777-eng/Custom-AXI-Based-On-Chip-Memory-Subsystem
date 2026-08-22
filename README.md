@@ -33,9 +33,9 @@ At a high level, this architecture is a data processing pipeline that flows left
 ### Phase 1: Core Interconnect and Memory Integration
 This subsystem connects the custom processing IP, `AT1051_CDAC_0`, to two independent on-chip Block RAM memories through an AXI-based memory architecture. The custom IP is the AXI master: it initiates read and write transactions whenever it needs to fetch stored instructions, coefficients, samples, intermediate values, or other working data.
 The two RAM memories are intentionally separated into two addressable regions:
-1. **RAM subsystem 0**
+1. **RAM subsystem 0 : ** 
    `axi_bram_ctrl_0` + `blk_mem_gen_0`
-2. **RAM subsystem 1**
+2. **RAM subsystem 1 : **
    `axi_bram_ctrl_1` + `blk_mem_gen_1`
 
 These are not merely separate memory blocks. Each RAM subsystem requires both an AXI-facing controller and a physical BRAM implementation:
